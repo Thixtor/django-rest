@@ -1,23 +1,38 @@
 from rest_framework import serializers
-from inmuebleslist_app.models import Edificacion, Empresa
+from inmuebleslist_app.models import Edificacion, Empresa, Comentario
 
-
-class EmpresaSerializer(serializers.ModelSerializer):
+class ComentarioSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Empresa
+        model = Comentario
         fields = "__all__"
+        
 
 class EdificacionSerializer(serializers.ModelSerializer):
     
+    comentarios = ComentarioSerializer(many=True, read_only=True)
     class Meta:
         model = Edificacion
         fields = "__all__" # Mostramos todos los campos
+        
         #fields = ['id', 'pais', 'active', 'imagen'] # Mostramos los campos requeridos
         #exclude = ['id'] # Excluimos los campos que no se deben mostrar
-        
+
+class EmpresaSerializer(serializers.HyperlinkedModelSerializer):
+    edificacionlist = EdificacionSerializer(many = True, read_only = True)
+    #edificacionlist = serializers.StringRelatedField(many = True)
+    #edificacionlist = serializers.PrimaryKeyRelatedField(many = True, read_only = True)
+    # edificacionlist = serializers.HyperlinkedRelatedField(
+    #     many=True,
+    #     read_only=True,
+    #     view_name='edificacion-detalle'
+    #     )
+    
+    class Meta:
+        model = Empresa
+        fields = "__all__"
         
 
-        
+
     # def get_longitud_direccion(self, object):
     #     cantidad_caracteres = len(object.direccion)
     #     return cantidad_caracteres

@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 
@@ -21,7 +22,7 @@ class Edificacion(models.Model):
     imagen = models.CharField(max_length=900)
     active = models.BooleanField(default=True)
     # Creamos la clave foranea para generar la relacion con la entidad empresa
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name="edificacion")
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name="edificacionlist")
     created = models.DateTimeField(auto_now_add=True) # Genera la fecha de registro del campo
     
     # Creamos una funcion para indicar cual es la columna a desplegar, 
@@ -29,6 +30,14 @@ class Edificacion(models.Model):
     def __str__(self):
         return self.direccion
     
-
+# Class que representa los comentarios
+class Comentario(models.Model):
+    calificacion = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    texto = models.CharField(max_length=200, null=True)
+    edificacion = models.ForeignKey(Edificacion, on_delete=models.CASCADE, related_name="comentarios")
+    active = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True)
+    update = models.DateTimeField(auto_now=True)
     
-    
+    def __str__(self):
+        return str(self.calificacion) + " " + self.edificacion.direccion
