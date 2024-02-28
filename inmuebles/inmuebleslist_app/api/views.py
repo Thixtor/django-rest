@@ -1,9 +1,50 @@
 from rest_framework.response import Response
-from inmuebleslist_app.models import Edificacion, Empresa
-from inmuebleslist_app.api.serializers import EdificacionSerializer, EmpresaSerializer
+from inmuebleslist_app.models import Edificacion, Empresa, Comentario
+from inmuebleslist_app.api.serializers import EdificacionSerializer, EmpresaSerializer, ComentarioSerializer
 #from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework import generics, mixins
+
+class ComentarioCreate(generics.CreateAPIView):
+    serializer_class = ComentarioSerializer
+    def perform_create(self, serializer):
+        pk = self.kwargs.get('pk')
+        inmueble = Edificacion.objects.get(pk=pk)
+        serializer.save(edificacion=inmueble)
+
+
+class ComentarioList(generics.ListCreateAPIView):
+    # queryset = Comentario.objects.all()
+    serializer_class = ComentarioSerializer
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        return Comentario.objects.filter(edificacion=pk)
+        
+    
+class ComentarioDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset= Comentario.objects.all()
+    serializer_class = ComentarioSerializer
+
+
+
+# class ComentarioList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+#     queryset = Comentario.objects.all()
+#     serializer_class = ComentarioSerializer
+    
+#     def get(self, request, *arg, **kwargs):
+#         return self.list(request, *arg, **kwargs)
+    
+#     def post(self, request, *arg, **kwargs):
+#         return self.create(request, *arg, **kwargs)
+    
+# class ComentarioDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
+#     queryset = Comentario.objects.all()
+#     serializer_class = ComentarioSerializer
+    
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
+    
 
 class EmpresaAV(APIView):
     
