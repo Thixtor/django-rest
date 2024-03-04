@@ -9,13 +9,15 @@ from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
-from inmuebleslist_app.api.permissions import AdminOrReadOnly, ComentarioUserOrReadOnly
+from inmuebleslist_app.api.permissions import IsAdminOrReadOnly, IsComentarioUserOrReadOnly
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 
 class ComentarioCreate(generics.CreateAPIView):
+    
+    # Agregamos permisos
+    permission_classes = [IsAuthenticated]
+    
     serializer_class = ComentarioSerializer
-    
-    
-    
     
     def get_queryset(self):
         return Comentario.objects.all()
@@ -44,7 +46,7 @@ class ComentarioCreate(generics.CreateAPIView):
 class ComentarioList(generics.ListCreateAPIView):
     # queryset = Comentario.objects.all()
     serializer_class = ComentarioSerializer
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     def get_queryset(self):
         pk = self.kwargs['pk']
         return Comentario.objects.filter(edificacion=pk)
@@ -53,7 +55,8 @@ class ComentarioList(generics.ListCreateAPIView):
 class ComentarioDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset= Comentario.objects.all()
     serializer_class = ComentarioSerializer
-    permission_classes = [ComentarioUserOrReadOnly]
+    permission_classes = [IsComentarioUserOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
 
 
@@ -75,7 +78,7 @@ class ComentarioDetail(generics.RetrieveUpdateDestroyAPIView):
 #         return self.retrieve(request, *args, **kwargs)
     
 class EmpresaVS(viewsets.ModelViewSet):
-    permission_classes = [AdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Empresa.objects.all()
     serializer_class = EmpresaSerializer
 
@@ -174,6 +177,9 @@ class EmpresaDetalleAV(APIView):
 
 class EdificacionAV(APIView):
     
+    # Agregamos permisos
+    permission_classes = [IsAdminOrReadOnly]
+    
     # Metodo que representa la consulta de todos los inmuebles 
     def get(self, request):
         inmuebles = Edificacion.objects.all()
@@ -190,6 +196,9 @@ class EdificacionAV(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class EdificacionDetalleAV(APIView):
+    
+    # Agregamos permisos
+    permission_classes = [IsAdminOrReadOnly]
 
     # Metodo para buscar un inmueble
     def get(self, request, pk):
