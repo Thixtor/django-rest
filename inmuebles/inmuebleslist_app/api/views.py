@@ -13,6 +13,7 @@ from inmuebleslist_app.api.permissions import IsAdminOrReadOnly, IsComentarioUse
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle, ScopedRateThrottle
 from inmuebleslist_app.api.throttling import ComentarioCreateThrottle, ComentarioListThrottle
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 # Filtros
 class UsuarioComentario(generics.ListAPIView):
@@ -198,8 +199,8 @@ class EmpresaDetalleAV(APIView):
 class EdificacionList(generics.ListAPIView):
     queryset = Edificacion.objects.all()
     serializer_class = EdificacionSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['direccion', 'empresa__nombre']
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['direccion', 'empresa__nombre']
 
 
 class EdificacionAV(APIView):
