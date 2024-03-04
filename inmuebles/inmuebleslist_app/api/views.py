@@ -10,12 +10,14 @@ from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from inmuebleslist_app.api.permissions import IsAdminOrReadOnly, IsComentarioUserOrReadOnly
-from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle, ScopedRateThrottle
+from inmuebleslist_app.api.throttling import ComentarioCreateThrottle, ComentarioListThrottle
 
 class ComentarioCreate(generics.CreateAPIView):
     
     # Agregamos permisos
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ComentarioCreateThrottle]
     
     serializer_class = ComentarioSerializer
     
@@ -46,6 +48,8 @@ class ComentarioCreate(generics.CreateAPIView):
 class ComentarioList(generics.ListCreateAPIView):
     # queryset = Comentario.objects.all()
     serializer_class = ComentarioSerializer
+    
+    throttle_classes = [ComentarioListThrottle, AnonRateThrottle]
     #permission_classes = [IsAuthenticated]
     def get_queryset(self):
         pk = self.kwargs['pk']
@@ -56,7 +60,8 @@ class ComentarioDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset= Comentario.objects.all()
     serializer_class = ComentarioSerializer
     permission_classes = [IsComentarioUserOrReadOnly]
-    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'comentario-detail'
 
 
 
