@@ -75,6 +75,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'inmuebles.wsgi.application'
 
+AUTH_USER_MODEL = 'user_app.Account'
+
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -155,6 +157,10 @@ REST_FRAMEWORK = {
         'comentario-list':'100000/day',
         'comentario-detail':'100000/day',
     },
+    
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
     
     #'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.LimitOffsetPagination',
     #'PAGE_SIZE':1,
